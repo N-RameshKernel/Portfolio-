@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ramesh.ai | Antigravity AI Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-base: #0A0A0A;
+            --neon-blue: #3b82f6;
+            --neon-purple: #8b5cf6;
+            --neon-red: #f43f5e;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: #ffffff;
+            overflow-x: hidden;
+            cursor: none;
+            /* Hide default cursor for custom one */
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .font-display {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Custom Trailing Cursor */
+        .cursor-dot,
+        .cursor-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+
+        .cursor-glow {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.05) 40%, transparent 70%);
+            transition: transform 0.1s ease-out;
+            /* Smooth trailing */
+            z-index: 0;
+        }
+
+        /* Click state for cursor */
+        body.clicking .cursor-dot {
+            width: 20px;
+            height: 20px;
+            background-color: var(--neon-red);
+            opacity: 0.5;
+        }
+
+        /* Glassmorphism & Borders */
+        .glass {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-card {
+            background: rgba(15, 15, 15, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Glowing Border Hover Effect */
+        .glass-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 2px;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple), var(--neon-red));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-10px) scale(1.02) perspective(1000px) rotateX(2deg) rotateY(-2deg);
+            box-shadow: 0 30px 60px -12px rgba(59, 130, 246, 0.15), 0 18px 36px -18px rgba(139, 92, 246, 0.15);
+        }
+
+        .glass-card:hover::after {
+            opacity: 1;
+        }
+
+        /* Text Gradients */
+        .text-gradient {
+            background: linear-gradient(to right, #fff, #9ca3af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .text-neon-gradient {
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-purple), var(--neon-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shine 5s linear infinite;
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        /* Floating Animations (Antigravity) */
+        @keyframes float-slow {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(1deg);
+            }
+        }
+
+        @keyframes float-medium {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .float-slow {
+            animation: float-slow 8s ease-in-out infinite;
+        }
+
+        .float-medium {
+            animation: float-medium 6s ease-in-out infinite;
+        }
+
+        .float-fast {
+            animation: float-medium 4s ease-in-out infinite;
+        }
+
+        .delay-1 {
+            animation-delay: 1s;
+        }
+
+        .delay-2 {
+            animation-delay: 2s;
+        }
+
+        /* Reveal on Scroll */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Neural Canvas */
+        #neural-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Scroll Arrow Indicator */
+        .scroll-arrow {
+            animation: bounce 2s infinite;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+
+        .scroll-arrow:hover {
+            opacity: 1;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-15px);
+            }
+
+            60% {
+                transform: translateY(-7px);
+            }
+        }
+
+        /* Input Fields */
+        .input-glow {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .input-glow:focus {
+            outline: none;
+            border-bottom-color: var(--neon-blue);
+            box-shadow: 0 10px 10px -10px rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+
+<body class="selection:bg-blue-500/30 selection:text-white">
+
+    <!-- Custom Cursor -->
+    <div class="cursor-glow" id="cursor-glow"></div>
+    <div class="cursor-dot" id="cursor-dot"></div>
+
+    <!-- Background Canvas -->
+    <canvas id="neural-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 px-6 md:px-12 py-6 flex justify-between items-center glass border-b-0">
+        <div class="flex items-center gap-3">
+            <div class="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></div>
+            <span class="font-display font-bold text-lg tracking-widest uppercase">ramesh<span
+                    class="text-blue-500">.ai</span></span>
+        </div>
+        <div class="hidden md:flex gap-8">
+            <a href="#projects"
+                class="text-sm text-gray-400 hover:text-white transition-colors uppercase tracking-widest">Projects</a>
+            <a href="#about"
+                class="text-sm text-gray-400 hover:text-white transition-colors uppercase tracking-widest">About</a>
+            <a href="#experience"
+                class="text-sm text-gray-400 hover:text-white transition-colors uppercase tracking-widest">Experience</a>
+        </div>
+        <a href="#contact"
+            class="px-6 py-2 rounded-full border border-white/20 text-sm font-medium hover:bg-white hover:text-black transition-all hover:scale-105 active:scale-95">
+            Contact Lab
+        </a>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex flex-col items-center justify-center px-6 pt-20 overflow-hidden">
+        <div
+            class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] float-slow mix-blend-screen">
+        </div>
+        <div
+            class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[100px] float-slow delay-2 mix-blend-screen">
+        </div>
+
+        <div class="z-10 text-center max-w-5xl mt-12">
+            <div
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border-white/10 text-xs text-gray-300 font-medium tracking-widest uppercase mb-8 reveal float-medium">
+                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                Node: ramesh.ai is Online
+            </div>
+
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter mb-6 leading-tight reveal delay-100">
+                Building <span class="text-neon-gradient">Intelligent Systems</span> <br /> with AI.
+            </h1>
+
+            <p
+                class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-12 font-light tracking-wide reveal delay-200">
+                AI Engineer | LLMs • Reinforcement Learning • Simulation
+            </p>
+
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-6 reveal delay-300">
+                <a href="#projects"
+                    class="group relative px-8 py-4 bg-white text-black rounded-full font-bold overflow-hidden transition-all hover:scale-105 active:scale-95">
+                    <span class="relative z-10 flex items-center gap-2">Explore Projects <i
+                            data-lucide="arrow-down-right"
+                            class="w-4 h-4 group-hover:rotate-45 transition-transform"></i></span>
+                    <div
+                        class="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 opacity-0 group-hover:opacity-100 transition-opacity z-0">
+                    </div>
+                </a>
+                <a href="#contact"
+                    class="px-8 py-4 rounded-full border border-white/20 text-white font-medium hover:bg-white/5 transition-all hover:scale-105">
+                    Request Access
+                </a>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <a href="#projects"
+            class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 scroll-arrow cursor-pointer z-20">
+            <span class="text-[10px] uppercase tracking-[0.2em] text-gray-500">Scroll</span>
+            <i data-lucide="chevron-down" class="text-gray-400 w-5 h-5"></i>
+        </a>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-32 px-6 md:px-12 max-w-7xl mx-auto relative z-10">
+        <div class="mb-20 text-center reveal">
+            <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-gradient">Experimental Nodes</h2>
+            <p class="text-gray-500 tracking-widest uppercase text-sm">Deployed Architectures & Models</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Card 1 -->
+            <div class="glass-card p-8 flex flex-col h-full float-slow reveal">
+                <div class="flex justify-between items-start mb-8">
+                    <div class="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                        <i data-lucide="brain-circuit" class="w-8 h-8"></i>
+                    </div>
+                    <span
+                        class="text-[10px] uppercase tracking-widest px-2 py-1 rounded-full border border-white/10 text-gray-400">Stable</span>
+                </div>
+                <h3 class="text-2xl font-bold mb-3 font-display">NeuroVerse AI</h3>
+                <p class="text-gray-400 text-sm mb-8 flex-grow leading-relaxed">
+                    LLM evaluation system engineered with real-time hallucination detection algorithms and multi-metric
+                    quality scoring.
+                </p>
+                <div class="flex flex-wrap gap-2 mb-8">
+                    <span class="text-[10px] font-medium bg-white/5 px-3 py-1 rounded-full">AI</span>
+                    <span class="text-[10px] font-medium bg-white/5 px-3 py-1 rounded-full">LLM</span>
+                    <span class="text-[10px] font-medium bg-white/5 px-3 py-1 rounded-full">Evaluation</span>
+                </div>
+                <div class="flex gap-4">
+                    <a href="https://github.com/N-RameshKernel" target="_blank"
+                        class="flex-1 py-3 bg-white/5 hover:bg-white hover:text-black rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors">
+                        <i data-lucide="github" class="w-4 h-4"></i> View Code
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="glass-card p-8 flex flex-col h-full float-medium delay-1 reveal">
+                <div class="flex justify-between items-start mb-8">
+                    <div class="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
+                        <i data-lucide="layers" class="w-8 h-8"></i>
+                    </div>
+                    <span
+                        class="text-[10px] uppercase tracking-widest px-2 py-1 rounded-full border border-white/10 text-gray-400">Simulating</span>
+                </div>
+                <h3 class="text-2xl font-bold mb-3 font-display">Synapse War</h3>
+                <p class="text-gray-400 text-sm mb-8 flex-grow leading-relaxed">
+                    High-performance AI simulation environment rendering swarm intelligence and interactive
+                    reinforcement learning agents.
+                </p>
+                <div class="flex flex-wrap gap-2 mb-8">
+                    <span class="text-[10px] font-medium bg-white/5 px-3 py-1 rounded-full">Simulation</span>
+                    <span class="text-[10px] font-medium bg-white/5 px-3 py-1 rounded-full">RL</span>
+                    <span class="text-[10px] font-medium bg-white/5 px-3 py-1 rounded-full">Agents</span>
+                </div>
+                <div class="flex gap-4">
+                    <a href="https://github.com/N-RameshKernel" target="_blank"
+                        class="flex-1 py-3 bg-white/5 hover:bg-white hover:text-black rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors">
+                        <i data-lucide="github" class="w-4 h-4"></i> View Code
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="glass-card p-8 flex flex-col h-full float-slow delay-2 reveal">
+                <div class="flex justify-between items-start mb-8">
+                    <div class="p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400">
+                        <i data-lucide="eye" class="w-8 h-8"></i>
+                    </div>
+                    <span
+                        class="text-[10px] uppercase tracking-widest px-2 py-1 rounded-full border border-white/10 text-gray-400">Mapping</span>
+                </div>
+                <h3 class="text-2xl font-bold mb-3 font-display">VisionForge SLAM</h3>
+                <p class="text-gray-400 text-sm mb-8 flex-grow leading-relaxed">
+                    Advanced visual odometry and 3D point cloud mapping system for autonomous spatial awareness.
+                </p>
+                <div class="flex flex-wrap gap-2 mb-8">
+                    <span class="text-[10px] font-medium bg-white/5 px-3 py-1 rounded-full">CV</span>
+                    <span class="text-[10px] font-medium bg-white/5 px-3 py-1 rounded-full">SLAM</span>
+                    <span class="text-[10px] font-medium bg-white/5 px-3 py-1 rounded-full">3D</span>
+                </div>
+                <div class="flex gap-4">
+                    <a href="https://github.com/N-RameshKernel" target="_blank"
+                        class="flex-1 py-3 bg-white/5 hover:bg-white hover:text-black rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors">
+                        <i data-lucide="github" class="w-4 h-4"></i> View Code
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-32 px-6 relative z-10 overflow-hidden">
+        <div class="max-w-4xl mx-auto text-center relative reveal">
+            <div
+                class="absolute -top-10 -left-10 md:left-0 p-4 rounded-full glass border-white/10 float-fast text-blue-400 opacity-50">
+                <i data-lucide="cpu"></i></div>
+            <div
+                class="absolute top-1/2 -right-10 md:-right-10 p-4 rounded-full glass border-white/10 float-slow delay-1 text-purple-400 opacity-50">
+                <i data-lucide="network"></i></div>
+            <div
+                class="absolute -bottom-10 left-10 p-4 rounded-full glass border-white/10 float-medium delay-2 text-red-400 opacity-50">
+                <i data-lucide="database"></i></div>
+
+            <h2 class="text-3xl md:text-5xl font-bold mb-8 font-display">Decoding the Complex</h2>
+            <p class="text-xl md:text-2xl text-gray-400 leading-relaxed font-light mb-12">
+                "I am an AI student passionate about architecting real-world intelligent systems. My focus lies at the
+                intersection of Large Language Models, Reinforcement Learning, and high-fidelity simulations."
+            </p>
+
+            <div class="flex flex-wrap justify-center gap-4">
+                <span
+                    class="px-5 py-2 glass rounded-full text-sm font-medium tracking-wide border-blue-500/30 text-blue-300">LLMOps</span>
+                <span
+                    class="px-5 py-2 glass rounded-full text-sm font-medium tracking-wide border-purple-500/30 text-purple-300">RAG</span>
+                <span
+                    class="px-5 py-2 glass rounded-full text-sm font-medium tracking-wide border-red-500/30 text-red-300">Prompt
+                    Eng</span>
+                <span
+                    class="px-5 py-2 glass rounded-full text-sm font-medium tracking-wide border-white/20 text-gray-300">Cloud
+                    Data</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience / Timeline -->
+    <section id="experience" class="py-32 px-6 max-w-5xl mx-auto relative z-10">
+        <div class="mb-20 reveal">
+            <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-gradient">System Logs</h2>
+            <p class="text-gray-500 tracking-widest uppercase text-sm">Professional Timeline</p>
+        </div>
+
+        <div class="relative border-l border-white/10 ml-4 md:ml-8 space-y-16">
+            <div class="relative pl-10 md:pl-16 reveal">
+                <div
+                    class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-blue-500 ring-4 ring-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.6)]">
+                </div>
+                <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-white animate-ping opacity-50"></div>
+                <div class="glass-card p-6 md:p-8 hover:border-blue-500/50 float-slow">
+                    <span class="text-blue-400 text-xs font-bold tracking-widest uppercase mb-2 block">2024 -
+                        Present</span>
+                    <h3 class="text-2xl font-bold mb-1 font-display">AI Intern</h3>
+                    <p class="text-gray-300 font-medium mb-4">@ MyDailyWork</p>
+                    <p class="text-gray-500 text-sm">Developing intelligent workflow systems and integrating LLM-powered
+                        features to automate complex daily operational tasks.</p>
+                </div>
+            </div>
+
+            <div class="relative pl-10 md:pl-16 reveal delay-1">
+                <div
+                    class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-purple-500 ring-4 ring-purple-500/20 shadow-[0_0_15px_rgba(139,92,246,0.6)]">
+                </div>
+                <div class="glass-card p-6 md:p-8 hover:border-purple-500/50 float-medium">
+                    <span class="text-purple-400 text-xs font-bold tracking-widest uppercase mb-2 block">2023 -
+                        2024</span>
+                    <h3 class="text-2xl font-bold mb-1 font-display">ML Intern</h3>
+                    <p class="text-gray-300 font-medium mb-4">@ SaiKet Systems</p>
+                    <p class="text-gray-500 text-sm">Engineered data pipelines and trained predictive machine learning
+                        models to optimize internal system performance metrics.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-32 px-6 max-w-3xl mx-auto relative z-10">
+        <div class="glass-card p-10 md:p-16 text-center float-slow reveal">
+            <h2 class="text-3xl md:text-5xl font-bold mb-4 font-display">Establish Connection</h2>
+            <p class="text-gray-400 mb-12 font-light">Initialize protocol to transmit a message directly to my inbox.
+            </p>
+
+            <form class="space-y-8 text-left" onsubmit="event.preventDefault();">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="relative group">
+                        <input type="text" id="name" required
+                            class="input-glow w-full py-3 text-white placeholder-transparent peer" placeholder="Name">
+                        <label for="name"
+                            class="absolute left-0 -top-3.5 text-xs text-gray-500 uppercase tracking-widest transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-blue-400">Identity
+                            / Name</label>
+                    </div>
+                    <div class="relative group">
+                        <input type="email" id="email" required
+                            class="input-glow w-full py-3 text-white placeholder-transparent peer" placeholder="Email">
+                        <label for="email"
+                            class="absolute left-0 -top-3.5 text-xs text-gray-500 uppercase tracking-widest transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-purple-400">Return
+                            Vector (Email)</label>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <textarea id="message" rows="4" required
+                        class="input-glow w-full py-3 text-white placeholder-transparent peer resize-none"
+                        placeholder="Message"></textarea>
+                    <label for="message"
+                        class="absolute left-0 -top-3.5 text-xs text-gray-500 uppercase tracking-widest transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-red-400">Payload
+                        / Message</label>
+                </div>
+
+                <button type="submit"
+                    class="w-full py-4 bg-white text-black font-bold uppercase tracking-widest text-sm rounded-xl hover:bg-blue-50 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3">
+                    Transmit <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+            </form>
+
+            <div class="flex justify-center gap-6 mt-12 border-t border-white/10 pt-8">
+                <a href="mailto:hello@ramesh.ai" class="text-gray-500 hover:text-white transition-colors float-fast"><i
+                        data-lucide="mail"></i></a>
+                <a href="https://github.com/N-RameshKernel" target="_blank"
+                    class="text-gray-500 hover:text-white transition-colors float-medium delay-1"><i
+                        data-lucide="github"></i></a>
+                <a href="#" class="text-gray-500 hover:text-white transition-colors float-slow delay-2"><i
+                        data-lucide="linkedin"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center text-xs text-gray-600 uppercase tracking-widest relative z-10">
+        <p>Operational // Managed by ramesh.ai © 2026</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+        reveals.forEach(reveal => observer.observe(reveal));
+
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorGlow = document.getElementById('cursor-glow');
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let glowX = mouseX;
+        let glowY = mouseY;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursorDot.style.left = `${mouseX}px`;
+            cursorDot.style.top = `${mouseY}px`;
+        });
+
+        document.addEventListener('mousedown', () => document.body.classList.add('clicking'));
+        document.addEventListener('mouseup', () => document.body.classList.remove('clicking'));
+
+        function animateCursor() {
+            glowX += (mouseX - glowX) * 0.15;
+            glowY += (mouseY - glowY) * 0.15;
+            cursorGlow.style.transform = `translate(calc(-50% + ${glowX}px), calc(-50% + ${glowY}px))`;
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        const canvas = document.getElementById('neural-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let canvasWidth, canvasHeight;
+
+        const particleCount = window.innerWidth < 768 ? 40 : 80;
+        const connectionDistance = 150;
+        const mouseInteractionRadius = 200;
+
+        function initCanvas() {
+            canvasWidth = window.innerWidth;
+            canvasHeight = window.innerHeight;
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+
+            particles = [];
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvasWidth,
+                    y: Math.random() * canvasHeight,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    radius: Math.random() * 1.5 + 0.5
+                });
+            }
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy - 0.1;
+
+                if (p.x < 0) p.x = canvasWidth;
+                if (p.x > canvasWidth) p.x = 0;
+                if (p.y < 0) p.y = canvasHeight;
+                if (p.y > canvasHeight) p.y = 0;
+
+                let dx = mouseX - p.x;
+                let dy = mouseY - p.y;
+                let distanceToMouse = Math.sqrt(dx * dx + dy * dy);
+
+                if (distanceToMouse < mouseInteractionRadius) {
+                    let force = (mouseInteractionRadius - distanceToMouse) / mouseInteractionRadius;
+                    p.x += (dx * force * 0.02);
+                    p.y += (dy * force * 0.02);
+                }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + (1 - Math.min(1, distanceToMouse / mouseInteractionRadius)) * 0.5})`;
+                ctx.fill();
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    let p2 = particles[j];
+                    let dx2 = p.x - p2.x;
+                    let dy2 = p.y - p2.y;
+                    let dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+
+                    if (dist2 < connectionDistance) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        let opacity = 1 - (dist2 / connectionDistance);
+                        if (distanceToMouse < mouseInteractionRadius) {
+                            ctx.strokeStyle = `rgba(139, 92, 246, ${opacity * 0.4})`;
+                        } else {
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.1})`;
+                        }
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(drawCanvas);
+        }
+
+        document.addEventListener('click', (e) => {
+            particles.forEach(p => {
+                let dx = p.x - e.clientX;
+                let dy = p.y - e.clientY;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 300) {
+                    p.vx += (dx / dist) * 5;
+                    p.vy += (dy / dist) * 5;
+                }
+            });
+        });
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        drawCanvas();
+    </script>
+</body>
+
+</html>
